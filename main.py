@@ -30,13 +30,17 @@ def request_url(url):
 
 
 def get_next_page(response):
-    soup = BeautifulSoup(response.content, 'html5lib')
-    next_urls = soup.select_one('div.page-index > a.next')
-    next_url = next_urls['href']
-    abs_url = f'https://cjdropshipping.com{next_url}'
-    print(abs_url)
-    response = request_url(abs_url)
-    return scrape(response)
+    try:
+        soup = BeautifulSoup(response.content, 'html5lib')
+        next_urls = soup.select_one('div.page-index > a.next')
+        next_url = next_urls['href']
+        abs_url = f'https://cjdropshipping.com{next_url}'
+        print(abs_url)
+        response = request_url(abs_url)
+        return scrape(response)
+    except Exception as e:
+        print('Error', str(e))
+        return 0
 
 
 def extract_text(soup, tag, sel):
@@ -77,8 +81,8 @@ def scrape(response):
 
 def writer_to_json(data):
     path = 'shipping'
-    if os.path.exists(path):
-        with open(f'{path}.json') as file:
+    if os.path.isfile(path):
+        with open(f'{path}.json', 'r') as file:
             char = json.load(file)
         char.append(data)
         with open(f'{path}.json', 'w', encoding='utf-8') as file:
